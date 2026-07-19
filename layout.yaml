@@ -1,0 +1,339 @@
+# PDLC Layout Manifest — machine-readable form of specification/project-layout.md
+# Agents and the readiness checker consume this to know where every artifact belongs,
+# how to recognize misplaced ones, and what each profile requires.
+# JSON Schema is generated from the Go types in ./layout (Go-first).
+apiVersion: pdlc.productbuildershq.org/v1
+kind: LayoutManifest
+version: 1
+
+# Directories that must NEVER be moved, reorganized, or written to (tool-native contracts).
+immovable:
+  - aidlc-docs
+  - .aidlc-rule-details
+  - specs
+  - .specify
+  - .visionspec
+  - .git
+  - node_modules
+  - docs/_generated
+  - site
+
+# Directory names that never hold a project's own product artifacts. Files here
+# are artifact-shaped (templates, fixtures, sample specs) but belong to tooling
+# or illustration, so classifying them would produce nonsense move plans.
+ignore:
+  - examples
+  - example
+  - templates
+  - testdata
+  - fixtures
+  - vendor
+  - .github
+  - .venv
+  - dist
+  - build
+  - coverage
+
+# Evaluation domains. Artifacts group into domains; the readiness report emits
+# one category per non-excluded domain.
+domains:
+  - id: requirements
+    title: Requirement Registry
+  - id: specs
+    title: Product Specifications
+    leafReports: [eval]
+  - id: gtm
+    title: Narrative Artifacts
+  - id: descriptive-docs
+    title: Descriptive Requirements
+  - id: personas
+    title: Personas
+  - id: guides
+    title: User & Admin Guides
+  - id: api
+    title: API Contract
+    leafReports: [quality/api-style]
+  - id: prototype
+    title: Prototype
+  - id: acceptance
+    title: Acceptance Tests
+    leafReports: [quality/acceptance]
+  - id: localization
+    title: Localization
+    leafReports: [quality/l10n]
+  - id: design-system
+    title: Design System
+    leafReports: [quality/design-system]
+  - id: state
+    title: PDLC State
+  # Quality-only domains have no canonical artifacts; they exist as evaluations.
+  - id: a11y
+    title: Accessibility
+    qualityOnly: true
+    leafReports: [quality/a11y]
+    # Optional by default: the builder may rebuild the prototype, so prototype
+    # a11y work may not transfer. Accessibility requirements remain normative.
+    profiles: { minimal: excluded, standard: optional, full: optional }
+  - id: consistency
+    title: Cross-Artifact Consistency
+    qualityOnly: true
+    leafReports: [quality/consistency]
+    profiles: { minimal: excluded, standard: recommended, full: recommended }
+
+artifacts:
+  # ── Requirement registry ──────────────────────────────────────────
+  - id: requirements-registry
+    domain: requirements
+    canonical: docs/specs/requirements.yaml
+    authority: normative
+    profiles: { minimal: required, standard: required, full: required }
+    detect:
+      filenames: [requirements.yaml, requirements-registry.yaml]
+
+  # ── VisionSpec source specs ───────────────────────────────────────
+  - id: prd
+    domain: specs
+    canonical: docs/specs/source/prd.md
+    authority: normative
+    profiles: { minimal: required, standard: required, full: required }
+    detect:
+      filenames: [prd.md, product-requirements.md]
+      content: ["# Product Requirements Document"]
+
+  - id: mrd
+    domain: specs
+    canonical: docs/specs/source/mrd.md
+    authority: normative
+    profiles: { minimal: optional, standard: required, full: required }
+    detect:
+      filenames: [mrd.md, market-requirements.md]
+
+  - id: uxd
+    domain: specs
+    canonical: docs/specs/source/uxd.md
+    authority: normative
+    profiles: { minimal: optional, standard: required, full: required }
+    detect:
+      filenames: [uxd.md, user-experience.md, ux-requirements.md]
+
+  - id: opportunity-spec
+    domain: specs
+    canonical: docs/specs/source/opportunity-spec.md
+    authority: informative
+    profiles: { minimal: optional, standard: optional, full: required }
+    detect:
+      filenames: [opportunity-spec.md, opportunity-assessment.md]
+
+  - id: technical-specs
+    domain: specs
+    canonical: docs/specs/technical
+    authority: normative
+    profiles: { minimal: excluded, standard: optional, full: required }
+    detect:
+      filenames: [trd.md, tpd.md, ird.md]
+
+  - id: reconciled-spec
+    domain: specs
+    canonical: docs/specs/spec.md
+    authority: normative
+    profiles: { minimal: optional, standard: optional, full: required }
+    detect:
+      filenames: [spec.md]
+
+  # ── Narrative / GTM artifacts ─────────────────────────────────────
+  - id: gtm-press
+    domain: gtm
+    canonical: docs/specs/gtm/press.md
+    authority: informative
+    profiles: { minimal: excluded, standard: optional, full: required }
+    detect:
+      filenames: [press.md, press-release.md]
+
+  - id: gtm-faq
+    domain: gtm
+    canonical: docs/specs/gtm/faq.md
+    authority: informative
+    profiles: { minimal: excluded, standard: optional, full: required }
+    detect:
+      filenames: [faq.md]
+
+  - id: gtm-narrative-6p
+    domain: gtm
+    canonical: docs/specs/gtm/narrative-6p.md
+    authority: informative
+    profiles: { minimal: excluded, standard: optional, full: required }
+    detect:
+      filenames: [narrative-6p.md, six-pager.md, 6-pager.md]
+
+  - id: gtm-narrative-1p
+    domain: gtm
+    canonical: docs/specs/gtm/narrative-1p.md
+    authority: informative
+    profiles: { minimal: excluded, standard: optional, full: optional }
+    detect:
+      filenames: [narrative-1p.md, one-pager.md, 1-pager.md]
+
+  # ── Descriptive requirements ──────────────────────────────────────
+  - id: concepts
+    domain: descriptive-docs
+    canonical: docs/concepts
+    authority: normative
+    profiles: { minimal: optional, standard: required, full: required }
+    detect:
+      dirnames: [concepts]
+
+  - id: entities
+    domain: descriptive-docs
+    canonical: docs/entities
+    authority: normative
+    profiles: { minimal: optional, standard: required, full: required }
+    detect:
+      dirnames: [entities, domain-model]
+
+  - id: processes
+    domain: descriptive-docs
+    canonical: docs/processes
+    authority: normative
+    profiles: { minimal: optional, standard: optional, full: required }
+    detect:
+      # "workflows" is deliberately absent: it collides with Go packages and
+      # .github/workflows far more often than it names process documentation.
+      dirnames: [processes]
+
+  - id: personas
+    domain: personas
+    canonical: docs/personas
+    authority: normative
+    profiles: { minimal: excluded, standard: optional, full: required }
+    detect:
+      dirnames: [personas]
+      filenames: [personas.json]
+
+  # ── Guides ────────────────────────────────────────────────────────
+  - id: user-guide
+    domain: guides
+    canonical: docs/guides/user
+    authority: normative
+    profiles: { minimal: excluded, standard: required, full: required }
+    detect:
+      dirnames: [user-guide, userguide, user-guides]
+
+  - id: admin-guide
+    domain: guides
+    canonical: docs/guides/admin
+    authority: normative
+    profiles: { minimal: excluded, standard: optional, full: required }
+    detect:
+      dirnames: [admin-guide, adminguide, admin-guides]
+
+  # ── API ───────────────────────────────────────────────────────────
+  - id: openapi
+    domain: api
+    canonical: docs/api/openapi.yaml
+    authority: advisory
+    profiles: { minimal: required, standard: required, full: required }
+    detect:
+      filenames: [openapi.yaml, openapi.yml, openapi.json, swagger.yaml, swagger.json]
+      content: ["openapi:"]
+
+  # ── Prototype ─────────────────────────────────────────────────────
+  - id: prototype-source
+    domain: prototype
+    canonical: prototype
+    authority: advisory
+    profiles: { minimal: excluded, standard: required, full: required }
+    detect:
+      filenames: [package.json]
+      notUnder: [docs]
+
+  - id: prototype-build
+    domain: prototype
+    canonical: docs/prototype/app
+    authority: advisory
+    profiles: { minimal: excluded, standard: required, full: required }
+    detect:
+      dirnames: [dist, build]
+
+  - id: prototype-schema
+    domain: prototype
+    canonical: prototype/schema
+    authority: advisory
+    profiles: { minimal: excluded, standard: optional, full: optional }
+    detect:
+      dirnames: [schema]
+      under: [prototype]
+
+  # ── Acceptance ────────────────────────────────────────────────────
+  - id: acceptance-journeys
+    domain: acceptance
+    canonical: acceptance/journeys
+    authority: normative
+    profiles: { minimal: optional, standard: required, full: required }
+    detect:
+      dirnames: [journeys]
+      content: ["verifies:"]
+
+  # ── Localization ──────────────────────────────────────────────────
+  - id: locales-manifest
+    domain: localization
+    canonical: locales/manifest.yaml
+    authority: normative
+    profiles: { minimal: excluded, standard: optional, full: required }
+    detect:
+      filenames: [manifest.yaml]
+      under: [locales, i18n, l10n]
+
+  - id: ui-catalogs
+    domain: localization
+    canonical: locales/ui
+    authority: normative
+    profiles: { minimal: excluded, standard: optional, full: required }
+    detect:
+      dirnames: [ui, translations]
+      under: [locales, i18n, l10n]
+
+  - id: guide-translations
+    domain: localization
+    canonical: locales/guides
+    authority: normative
+    profiles: { minimal: excluded, standard: excluded, full: required }
+    detect:
+      dirnames: [guides]
+      under: [locales]
+
+  - id: glossary
+    domain: localization
+    canonical: locales/glossary
+    authority: normative
+    profiles: { minimal: excluded, standard: optional, full: required }
+    detect:
+      dirnames: [glossary]
+      filenames: [glossary.yaml, glossary.md]
+
+  # ── Design system ─────────────────────────────────────────────────
+  - id: design-system
+    domain: design-system
+    canonical: design-system
+    authority: normative
+    profiles: { minimal: excluded, standard: optional, full: optional }
+    detect:
+      dirnames: [design-system, design_system]
+      filenames: [meta.json]
+
+  # ── PDLC state ────────────────────────────────────────────────────
+  - id: pdlc-manifest
+    domain: state
+    canonical: pdlc.yaml
+    authority: normative
+    profiles: { minimal: required, standard: required, full: required }
+    detect:
+      filenames: [pdlc.yaml]
+
+  - id: pdlc-docs
+    domain: state
+    canonical: pdlc-docs
+    authority: evidence
+    profiles: { minimal: required, standard: required, full: required }
+    detect:
+      dirnames: [pdlc-docs]
+      filenames: [pdlc-state.md, audit.md]
