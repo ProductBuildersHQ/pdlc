@@ -1,3 +1,10 @@
 /site/
 /pdlc
 *.out
+
+# Generated PIDL diagrams
+model/*.mmd
+model/*.svg
+model/*.dot
+model/*.puml
+model/*.d2

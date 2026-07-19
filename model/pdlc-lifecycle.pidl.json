@@ -1,0 +1,336 @@
+{
+  "protocol": {
+    "id": "pdlc-lifecycle",
+    "name": "PDLC — Product Development Lifecycle",
+    "kind": "process",
+    "version": "0.1.0",
+    "description": "Formal process model of the ProductBuildersHQ Product Development Lifecycle: the product person's stages that produce an approved Product Baseline, the deterministic readiness check and human approval gate, and the handoff to a builder. Step outputs reference the canonical layout paths defined in layout.yaml.",
+    "category": "agent",
+    "references": [
+      {
+        "name": "PDLC Specification",
+        "url": "https://github.com/ProductBuildersHQ/pdlc"
+      }
+    ]
+  },
+  "phases": [
+    {
+      "id": "product_definition_lifecycle",
+      "name": "Product Definition Lifecycle",
+      "description": "The product person's work: discovery through an approved Product Baseline."
+    },
+    {
+      "id": "discovery",
+      "name": "Discovery",
+      "description": "Why build this, and is it worth building? Evidence in, synthesized specs out.",
+      "parent": "product_definition_lifecycle"
+    },
+    {
+      "id": "definition",
+      "name": "Definition",
+      "description": "What are we building, for whom, and how do we describe it?",
+      "parent": "product_definition_lifecycle"
+    },
+    {
+      "id": "experience",
+      "name": "Experience & Prototype",
+      "description": "What does it feel like, and does the definition hold together end to end?",
+      "parent": "product_definition_lifecycle"
+    },
+    {
+      "id": "documentation",
+      "name": "Documentation & Localization",
+      "description": "How do users succeed, and does it work globally?",
+      "parent": "product_definition_lifecycle"
+    },
+    {
+      "id": "handoff",
+      "name": "Baseline & Handoff",
+      "description": "Freeze what was approved and hand it to the builder."
+    },
+    {
+      "id": "builder_lifecycle",
+      "name": "Builder Lifecycle",
+      "description": "Engineering consumes the approved baseline. Out of PDLC's scope; shown for context."
+    }
+  ],
+  "entities": [
+    {
+      "id": "discovery",
+      "name": "Discovery",
+      "type": "server",
+      "description": "Synthesize opportunity, market analysis, and personas from discovery evidence. Raw PII evidence stays external and is referenced via docs/discovery/sources.yaml.",
+      "step_type": "llm",
+      "inputs": [
+        { "kind": "file", "name": "product_brief", "description": "Initial product idea or brief", "required": true },
+        { "kind": "file", "name": "docs/discovery/sources.yaml", "description": "References to external (RBAC/ABAC) evidence; no PII in-repo" }
+      ],
+      "outputs": [
+        { "kind": "file", "name": "docs/specs/source/opportunity-spec.md", "description": "Opportunity specification" },
+        { "kind": "file", "name": "docs/specs/market/competitive-matrix.md", "description": "Competitive analysis" },
+        { "kind": "file", "name": "docs/personas/personas.json", "description": "Synthesized personas IR" }
+      ],
+      "processing": { "engine": "llm", "determinism": "non_deterministic" }
+    },
+    {
+      "id": "definition",
+      "name": "Definition",
+      "type": "server",
+      "description": "Produce the normative product specs and the requirement registry, with narrative GTM artifacts.",
+      "step_type": "llm",
+      "inputs": [
+        { "kind": "file", "name": "docs/specs/source/opportunity-spec.md", "description": "Approved opportunity", "required": true },
+        { "kind": "file", "name": "docs/personas/personas.json", "description": "Personas" }
+      ],
+      "outputs": [
+        { "kind": "file", "name": "docs/specs/source/prd.md", "description": "Product Requirements" },
+        { "kind": "file", "name": "docs/specs/source/uxd.md", "description": "Experience Requirements" },
+        { "kind": "file", "name": "docs/specs/requirements.yaml", "description": "Requirement-ID registry" },
+        { "kind": "file", "name": "docs/specs/gtm/narrative-6p.md", "description": "Six-pager" }
+      ],
+      "processing": { "engine": "llm", "determinism": "non_deterministic" }
+    },
+    {
+      "id": "review_definition",
+      "name": "Definition Review",
+      "type": "user",
+      "description": "Human approval of the product specs after VisionSpec rubric evaluation passes.",
+      "step_type": "human",
+      "inputs": [
+        { "kind": "file", "name": "docs/specs/source/prd.md", "description": "PRD for review", "required": true },
+        { "kind": "file", "name": "docs/specs/source/uxd.md", "description": "UXD for review", "required": true }
+      ],
+      "outputs": [
+        { "kind": "object", "name": "definition_approval", "description": "Approval decision with reviewer feedback" }
+      ],
+      "processing": { "engine": "human", "determinism": "non_deterministic" }
+    },
+    {
+      "id": "experience",
+      "name": "Experience & Prototype",
+      "type": "server",
+      "description": "Build the runnable prototype (advisory) and the executable acceptance journeys (normative, transfer to the builder).",
+      "step_type": "llm",
+      "inputs": [
+        { "kind": "file", "name": "docs/specs/source/uxd.md", "description": "Approved UXD", "required": true },
+        { "kind": "file", "name": "docs/specs/requirements.yaml", "description": "Requirement registry", "required": true }
+      ],
+      "outputs": [
+        { "kind": "directory", "name": "docs/prototype/app", "description": "Built static prototype" },
+        { "kind": "directory", "name": "acceptance/journeys", "description": "Executable acceptance journeys (role-based locators, per-locale)" }
+      ],
+      "processing": { "engine": "llm", "determinism": "non_deterministic" }
+    },
+    {
+      "id": "api",
+      "name": "API Contract",
+      "type": "server",
+      "description": "Define the OpenAPI contract, rendered via Scalar and judged by api-style when a profile is configured.",
+      "step_type": "llm",
+      "inputs": [
+        { "kind": "file", "name": "docs/specs/requirements.yaml", "description": "Requirement registry", "required": true }
+      ],
+      "outputs": [
+        { "kind": "file", "name": "docs/api/openapi.yaml", "description": "OpenAPI contract" }
+      ],
+      "processing": { "engine": "llm", "determinism": "non_deterministic" }
+    },
+    {
+      "id": "documentation",
+      "name": "Documentation",
+      "type": "server",
+      "description": "Author user and admin guides against the prototype.",
+      "step_type": "llm",
+      "inputs": [
+        { "kind": "directory", "name": "docs/prototype/app", "description": "Built prototype to document", "required": true }
+      ],
+      "outputs": [
+        { "kind": "directory", "name": "docs/guides/user", "description": "User guide (source locale)" },
+        { "kind": "directory", "name": "docs/guides/admin", "description": "Admin guide (source locale)" }
+      ],
+      "processing": { "engine": "llm", "determinism": "non_deterministic" }
+    },
+    {
+      "id": "localization",
+      "name": "Localization",
+      "type": "server",
+      "description": "Translate guides first (they carry translator context), then UI string catalogs, then judge coverage.",
+      "step_type": "llm",
+      "inputs": [
+        { "kind": "directory", "name": "docs/guides/user", "description": "Source-locale guides", "required": true },
+        { "kind": "directory", "name": "locales/ui", "description": "Source-locale UI catalogs", "required": true }
+      ],
+      "outputs": [
+        { "kind": "directory", "name": "locales/guides", "description": "Translated guides per locale" },
+        { "kind": "directory", "name": "locales/ui", "description": "Translated UI catalogs per locale" }
+      ],
+      "processing": { "engine": "llm", "determinism": "non_deterministic" }
+    },
+    {
+      "id": "readiness_check",
+      "name": "Readiness Check",
+      "type": "tool_server",
+      "description": "Deterministic evaluation of every in-scope domain (pdlc check). Presence on the checklist scale, quality from tool leaf reports; unrun tools score partial, never a silent pass.",
+      "step_type": "deterministic",
+      "inputs": [
+        { "kind": "file", "name": "pdlc.yaml", "description": "Declared profile and overrides", "required": true },
+        { "kind": "directory", "name": "quality", "description": "Tool leaf reports (design-system, api-style, a11y, l10n, acceptance, consistency)" }
+      ],
+      "outputs": [
+        { "kind": "file", "name": "quality/readiness.json", "description": "Structured-evaluation readiness report" }
+      ],
+      "processing": { "engine": "deterministic", "determinism": "deterministic" }
+    },
+    {
+      "id": "baseline_gate",
+      "name": "Baseline Approval",
+      "type": "user",
+      "description": "Human approval of the Product Baseline: readiness green for the profile, no unresolved error-severity consistency findings. Pins each source to a git revision with an authority level.",
+      "step_type": "human",
+      "inputs": [
+        { "kind": "file", "name": "quality/readiness.json", "description": "Readiness report", "required": true }
+      ],
+      "outputs": [
+        { "kind": "file", "name": "pdlc-docs/baselines/baseline.yaml", "description": "Approved, revision-pinned Product Baseline manifest" }
+      ],
+      "processing": { "engine": "human", "determinism": "non_deterministic" }
+    },
+    {
+      "id": "builder",
+      "name": "Builder",
+      "type": "service_provider",
+      "description": "Engineering methodology (AWS AI-DLC, Spec Kit, OpenSpec, or team convention) consuming the approved baseline. Outside PDLC's scope.",
+      "step_type": "external",
+      "inputs": [
+        { "kind": "file", "name": "pdlc-docs/baselines/baseline.yaml", "description": "Approved Product Baseline", "required": true }
+      ],
+      "outputs": [
+        { "kind": "object", "name": "implementation_feedback", "description": "Feasibility, cost, and constraint findings fed back into the next baseline" }
+      ],
+      "processing": { "engine": "external", "determinism": "non_deterministic" }
+    }
+  ],
+  "flows": [
+    {
+      "from": "discovery",
+      "to": "definition",
+      "action": "provide_discovery",
+      "label": "Discovery → Definition",
+      "mode": "request",
+      "phase": "discovery",
+      "note": "Synthesized opportunity and personas ground the product specs",
+      "data_mappings": [
+        { "output_port": "docs/specs/source/opportunity-spec.md", "input_port": "docs/specs/source/opportunity-spec.md" },
+        { "output_port": "docs/personas/personas.json", "input_port": "docs/personas/personas.json" }
+      ]
+    },
+    {
+      "from": "definition",
+      "to": "review_definition",
+      "action": "submit_for_review",
+      "label": "Definition → Review",
+      "mode": "request",
+      "phase": "definition",
+      "data_mappings": [
+        { "output_port": "docs/specs/source/prd.md", "input_port": "docs/specs/source/prd.md" },
+        { "output_port": "docs/specs/source/uxd.md", "input_port": "docs/specs/source/uxd.md" }
+      ]
+    },
+    {
+      "from": "review_definition",
+      "to": "experience",
+      "action": "approve_definition",
+      "label": "Approved → Prototype",
+      "mode": "request",
+      "phase": "definition",
+      "condition": "definition_approval.approved == true",
+      "note": "Prototype and acceptance journeys build on the approved UXD and registry"
+    },
+    {
+      "from": "review_definition",
+      "to": "api",
+      "action": "approve_definition",
+      "label": "Approved → API",
+      "mode": "request",
+      "phase": "definition",
+      "condition": "definition_approval.approved == true",
+      "note": "API contract may proceed in parallel with the prototype"
+    },
+    {
+      "from": "experience",
+      "to": "documentation",
+      "action": "provide_prototype",
+      "label": "Prototype → Guides",
+      "mode": "request",
+      "phase": "experience",
+      "note": "Guides are written against the prototype",
+      "data_mappings": [
+        { "output_port": "docs/prototype/app", "input_port": "docs/prototype/app" }
+      ]
+    },
+    {
+      "from": "documentation",
+      "to": "localization",
+      "action": "provide_guides",
+      "label": "Guides → Localization",
+      "mode": "request",
+      "phase": "documentation",
+      "note": "Guides-before-UI: translated guides establish terminology the UI translation reuses",
+      "data_mappings": [
+        { "output_port": "docs/guides/user", "input_port": "docs/guides/user" }
+      ]
+    },
+    {
+      "from": "localization",
+      "to": "readiness_check",
+      "action": "converge_artifacts",
+      "label": "Localization → Readiness",
+      "mode": "request",
+      "phase": "handoff",
+      "note": "All in-scope artifacts converge for evaluation"
+    },
+    {
+      "from": "api",
+      "to": "readiness_check",
+      "action": "converge_artifacts",
+      "label": "API → Readiness",
+      "mode": "request",
+      "phase": "handoff",
+      "data_mappings": [
+        { "output_port": "docs/api/openapi.yaml", "input_port": "quality" }
+      ]
+    },
+    {
+      "from": "readiness_check",
+      "to": "baseline_gate",
+      "action": "report_readiness",
+      "label": "Readiness → Baseline gate",
+      "mode": "request",
+      "phase": "handoff",
+      "data_mappings": [
+        { "output_port": "quality/readiness.json", "input_port": "quality/readiness.json" }
+      ]
+    },
+    {
+      "from": "baseline_gate",
+      "to": "builder",
+      "action": "hand_off_baseline",
+      "label": "Approved baseline → Builder",
+      "mode": "request",
+      "phase": "handoff",
+      "condition": "readiness.pass == true",
+      "data_mappings": [
+        { "output_port": "pdlc-docs/baselines/baseline.yaml", "input_port": "pdlc-docs/baselines/baseline.yaml" }
+      ]
+    },
+    {
+      "from": "builder",
+      "to": "definition",
+      "action": "feed_back",
+      "label": "Implementation feedback → next baseline",
+      "mode": "callback",
+      "phase": "builder_lifecycle",
+      "note": "Feasibility and cost findings correct the definition upstream, never patch downstream"
+    }
+  ]
+}

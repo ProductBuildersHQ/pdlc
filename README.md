@@ -28,6 +28,7 @@ PDLC is the *specification*; `pdlc-workflows` is the *reference implementation* 
 | [Handoff](docs/specification/handoff.md) | The Product Baseline — the versioned contract between product and builder |
 | [Adoption](docs/specification/adoption.md) | Agent-driven brownfield migration to the canonical layout + readiness evaluation |
 | [`layout.yaml`](layout.yaml) | The layout contract in machine-readable form: canonical paths, detection heuristics, per-profile requirements |
+| [`model/`](model/) | The lifecycle as a formal [PIDL](https://github.com/grokify/pidl) process model — typed steps, data flows over canonical paths, and gates |
 
 ## Core principles
 
