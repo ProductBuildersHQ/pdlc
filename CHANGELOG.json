@@ -1,0 +1,36 @@
+{
+  "irVersion": "1.0",
+  "project": "pdlc",
+  "repository": "https://github.com/ProductBuildersHQ/pdlc",
+  "versioning": "semver",
+  "commitConvention": "conventional",
+  "maintainers": ["johncwang@gmail.com"],
+  "releases": [
+    {
+      "version": "v0.1.0",
+      "date": "2026-07-19",
+      "commit": "0abb1d3",
+      "highlights": [
+        { "description": "Initial release of the ProductBuildersHQ Product Development Lifecycle (PDLC): the normative specification plus a Go module that classifies a project repository against the layout contract and evaluates readiness for handoff to a builder" },
+        { "description": "Readiness evaluation emits a structured-evaluation report scoring each in-scope domain on artifact presence and, where a tool has run, quality — with unrun tools held at conditional rather than passing silently" }
+      ],
+      "added": [
+        { "description": "Layout contract as Go types with an embedded layout.yaml: canonical paths, per-profile requirement levels, authority, and detection heuristics for every product-definition artifact", "commit": "b83e9eb" },
+        { "description": "Repository classifier that skips immovable (tool-native) and ignored (templates, examples, fixtures) directories, flags path conflicts, and never auto-proposes moves from content-only matches", "commit": "b83e9eb" },
+        { "description": "pdlc.yaml project manifest with profile selection and per-domain override resolution", "commit": "d66021b" },
+        { "description": "Readiness evaluator producing a structured-evaluation report: checklist-scale presence, leaf-report quality, and TOOL_NOT_RUN semantics for unrun tools", "commit": "9694cf4" },
+        { "description": "pdlc CLI (Cobra) with check, inventory, init, and layout commands", "commit": "bdc8024" },
+        { "description": "Go-first JSON Schema generation for the layout and project manifests, embedded for programmatic access", "commit": "82ed0b0" },
+        { "description": "PDLC specification: lifecycle stages, canonical project layout, review-site assembly, quality evaluation, requirement registry and executable acceptance tests, agent-driven adoption, and the Product Baseline handoff contract", "commit": "0abb1d3" }
+      ],
+      "tests": [
+        { "description": "Coverage for layout classification (immovable protection, misplaced-artifact detection, conflicts) and readiness evaluation (override semantics, TOOL_NOT_RUN, conditional readiness, locale coverage, profile scaling, idempotence)", "commit": "727a721" }
+      ],
+      "dependencies": [
+        { "description": "Add github.com/plexusone/structured-evaluation for readiness report output", "commit": "ebff482" },
+        { "description": "Add github.com/spf13/cobra for the CLI", "commit": "ebff482" },
+        { "description": "Add github.com/invopop/jsonschema for Go-first schema generation", "commit": "ebff482" }
+      ]
+    }
+  ]
+}
