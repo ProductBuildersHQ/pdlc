@@ -1,6 +1,7 @@
 package specplan_test
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/ProductBuildersHQ/pdlc/specplan"
@@ -11,7 +12,7 @@ func TestListProfilesIncludesBigTech(t *testing.T) {
 	if len(names) == 0 {
 		t.Fatal("no spec profiles listed")
 	}
-	if !contains(names, "big-tech-product") {
+	if !slices.Contains(names, "big-tech-product") {
 		t.Errorf("expected big-tech-product among profiles, got %v", names)
 	}
 }
@@ -71,13 +72,4 @@ func TestTemplateReturnsContent(t *testing.T) {
 	if len(content) == 0 {
 		t.Error("prd template is empty")
 	}
-}
-
-func contains(s []string, want string) bool {
-	for _, v := range s {
-		if v == want {
-			return true
-		}
-	}
-	return false
 }
