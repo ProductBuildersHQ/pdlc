@@ -36,12 +36,20 @@ Each stage lists its deliverables, the tool that produces them, and its exit gat
 
 *Why build this, and is it worth building?*
 
-| Deliverable | Location | Produced with |
-|-------------|----------|---------------|
-| Opportunity spec, market analysis | `docs/specs/source/` | VisionSpec (discovery profiles) |
-| Vision | `docs/specs/source/` | VisionSpec |
+Discovery splits three ways by structure and sensitivity — the mirror image of how the prototype sits downstream of the specs:
 
-**Exit gate:** opportunity approved by product person.
+| Deliverable | Location | Authority |
+|-------------|----------|-----------|
+| Opportunity spec, vision | `docs/specs/source/` | normative — VisionSpec |
+| Competitive matrix, SWOT, TAM/SAM/SOM | `docs/specs/market/` | informative — VisionSpec discovery spec types |
+| Personas | `docs/personas/` (+ `personas.json`) | normative — synthesized customer spec |
+| Research synthesis notes | `docs/discovery/` | informative — narrative, PII-free |
+| Evidence references | `docs/discovery/sources.yaml` | evidence — points to external raw data |
+| Raw customer/market evidence (interviews, surveys, analytics) | **outside the repo** — excluded, or a separate RBAC/ABAC store | evidence — never in VisionSpec, never published |
+
+The synthesized specs are the *conclusions*; the raw evidence is the *source material* they are grounded in. VisionSpec consumes discovery evidence to ground its synthesis the same way the builder later consumes the baseline — evidence in, specs out. Raw PII evidence never enters the reviewable repository; it is referenced from `sources.yaml`, which lets requirements and personas cite their evidence without exposing it (see [project layout](project-layout.md#where-spec-types-are-defined-vs-where-instances-live)).
+
+**Exit gate:** opportunity approved by product person; where analytical specs are in scope, their VisionSpec rubrics pass.
 
 ### 2. Definition
 

@@ -44,10 +44,16 @@ domains:
     leafReports: [eval]
   - id: gtm
     title: Narrative Artifacts
+  - id: market
+    title: Market & Competitive Analysis
+    leafReports: [eval]
+  - id: discovery
+    title: Discovery Evidence
   - id: descriptive-docs
     title: Descriptive Requirements
   - id: personas
     title: Personas
+    leafReports: [eval]
   - id: guides
     title: User & Admin Guides
   - id: api
@@ -172,6 +178,57 @@ artifacts:
     profiles: { minimal: excluded, standard: optional, full: optional }
     detect:
       filenames: [narrative-1p.md, one-pager.md, 1-pager.md]
+
+  # ── Market & competitive analysis (VisionSpec discovery spec types) ─
+  # These are per-product analytical specs — structured, rubric-scored,
+  # synthesized from discovery evidence. Their TYPE definitions (schema +
+  # rubric + template) live in VisionSpec alongside the canvases it already
+  # ships (BMC, lean-canvas, opportunity-spec); these entries locate each
+  # instance in a project.
+  - id: competitive-matrix
+    domain: market
+    canonical: docs/specs/market/competitive-matrix.md
+    authority: informative
+    profiles: { minimal: excluded, standard: optional, full: recommended }
+    detect:
+      filenames: [competitive-matrix.md, competitive-analysis.md, competitors.md]
+
+  - id: swot
+    domain: market
+    canonical: docs/specs/market/swot.md
+    authority: informative
+    profiles: { minimal: excluded, standard: optional, full: recommended }
+    detect:
+      filenames: [swot.md, swot-analysis.md]
+
+  - id: market-sizing
+    domain: market
+    canonical: docs/specs/market/market-sizing.md
+    authority: informative
+    profiles: { minimal: excluded, standard: optional, full: recommended }
+    detect:
+      filenames: [market-sizing.md, tam-sam-som.md, market-size.md]
+
+  # ── Discovery evidence ────────────────────────────────────────────
+  # Raw customer/market evidence (interviews, surveys, analytics) is PII-bearing
+  # and lives OUTSIDE this repo — excluded, or in a separate RBAC/ABAC-controlled
+  # store. Only the reference manifest and PII-free synthesis narratives live here.
+  - id: discovery-sources
+    domain: discovery
+    canonical: docs/discovery/sources.yaml
+    authority: evidence
+    profiles: { minimal: excluded, standard: optional, full: optional }
+    detect:
+      filenames: [sources.yaml]
+      under: [discovery]
+
+  - id: discovery-notes
+    domain: discovery
+    canonical: docs/discovery
+    authority: informative
+    profiles: { minimal: excluded, standard: optional, full: optional }
+    detect:
+      dirnames: [discovery, research]
 
   # ── Descriptive requirements ──────────────────────────────────────
   - id: concepts

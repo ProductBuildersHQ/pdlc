@@ -27,6 +27,10 @@ project/
 │   │   ├── spec.md              #   reconciled execution spec
 │   │   └── current-truth.md     #   post-ship reality
 │   │
+│   ├── specs/market/            # competitive-matrix.md, swot.md, market-sizing.md
+│   │                            #   (VisionSpec discovery spec types; TAM/SAM/SOM)
+│   ├── discovery/               # sources.yaml (references to external PII evidence)
+│   │                            #   + PII-free synthesis notes; raw evidence stays out
 │   ├── concepts/                # descriptive requirements: domain concepts
 │   ├── entities/                # entities and relationships
 │   ├── processes/               # end-to-end process workflows (beyond user stories)
@@ -108,6 +112,57 @@ PDLC's rule is **define when possible; narrate when needed**: where a machine-re
 | **Baseline** | `baseline.yaml` manifest | — | — |
 
 "Required" means the stage gate checks for the artifact; "recommended" means the gate uses it when present (e.g., API conformance is judged only when a style profile is configured, but the OpenAPI file itself is always required for the API stage).
+
+## Where spec types are defined vs. where instances live
+
+Two different "wheres" must not be conflated:
+
+- **The spec *type*** — the schema, rubric, and template for "a SWOT" or "a persona" — is owned by a library in the ecosystem.
+- **The spec *instance*** — this product's actual SWOT, filled in with real competitors — lives in the project repository at the canonical path this layout assigns.
+
+The routing rule for a spec type is a single question: *what is this describing?*
+
+| The type describes… | Owned by | Examples |
+|---------------------|----------|----------|
+| **One product's definition or analysis** | **VisionSpec** (spec type: schema + rubric + template) | MRD, PRD, UXD, personas, competitive matrix, SWOT, TAM/SAM/SOM, BMC, lean canvas, opportunity spec |
+| **A reusable framework applied across products** | **[productbuildershq-frameworks](https://github.com/ProductBuildersHQ/productbuildershq-frameworks)** (machine-readable definition + PIDL) | maturity models (PBMM, ASDM), metrics frameworks (AI-DORA, AI-SPACE), methodologies (AI-DLC) |
+| **Org or portfolio strategy above any one product** | **PRISM** | V2MOM, capability model, roadmap, org maturity |
+
+The commonly recognized discovery and strategy artifacts — **personas, competitive matrix, SWOT, TAM/SAM/SOM** — are all per-product analysis, so their types belong in **VisionSpec** as spec types, joining the canvases it already ships (BMC, lean canvas, opportunity spec). Each gets a template and a rubric so it is authored and evaluated the same way as an MRD or PRD, following *define when possible, narrate when needed* — a structured competitive matrix where the shape fits, narrative research memos where it does not (exactly as requirements pair structured FRs with narrative concepts and entities).
+
+Their instances live in the project under the market and personas domains:
+
+```text
+docs/specs/market/
+├── competitive-matrix.md
+├── swot.md
+└── market-sizing.md          # TAM / SAM / SOM
+docs/personas/
+└── ...                       # persona pages, rendered from personas.json IR
+```
+
+### Discovery evidence stays out of the reviewable repo
+
+These structured specs are *synthesized from* discovery evidence — customer interviews, surveys, analytics, market reports. That raw evidence is PII-bearing and does **not** belong in the published repository. It is either excluded entirely or held in a separate store with stricter RBAC/ABAC, and referenced by a manifest that carries no PII:
+
+```text
+docs/discovery/
+├── sources.yaml              # references to external evidence (no PII in-repo)
+└── ...                       # PII-free synthesis notes, optional
+```
+
+```yaml
+# docs/discovery/sources.yaml
+sources:
+  - id: SRC-INT-2026-03
+    type: customer-interview
+    sensitivity: pii
+    location: git+ssh://pii-repo/interviews/2026-03   # RBAC/ABAC-controlled
+    access: research-team
+    grounds: [persona-admin-ops, FR-0012]             # what it backs
+```
+
+This closes the front of the traceability chain — `FR-0012` ← `persona-admin-ops` ← `SRC-INT-2026-03` ← (external, access-controlled) — so a requirement is visibly evidence-backed while the transcript itself stays behind access control. As VisionSpec grows structured spec types for customer and market data, more synthesis migrates from narrative into rubric-scored specs; the raw evidence never crosses into the repo.
 
 ## Profiles
 
