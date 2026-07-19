@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://productbuildershq.org/schema/product-project.schema.json",
+  "$defs": {
+    "A11yTarget": {
+      "properties": {
+        "wcagVersion": {
+          "type": "string"
+        },
+        "level": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "APIStyleTarget": {
+      "properties": {
+        "profile": {
+          "type": "string"
+        },
+        "spec": {
+          "type": "string"
+        },
+        "level": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Builder": {
+      "properties": {
+        "methodology": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DesignSystemTarget": {
+      "properties": {
+        "spec": {
+          "type": "string"
+        },
+        "threshold": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "L10nTarget": {
+      "properties": {
+        "minimumCoverage": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Locales": {
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "targets": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Metadata": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id"
+      ]
+    },
+    "Quality": {
+      "properties": {
+        "designSystem": {
+          "$ref": "#/$defs/DesignSystemTarget"
+        },
+        "apiStyle": {
+          "$ref": "#/$defs/APIStyleTarget"
+        },
+        "a11y": {
+          "$ref": "#/$defs/A11yTarget"
+        },
+        "l10n": {
+          "$ref": "#/$defs/L10nTarget"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Spec": {
+      "properties": {
+        "profile": {
+          "type": "string"
+        },
+        "artifacts": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "locales": {
+          "$ref": "#/$defs/Locales"
+        },
+        "quality": {
+          "$ref": "#/$defs/Quality"
+        },
+        "builder": {
+          "$ref": "#/$defs/Builder"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "profile"
+      ]
+    }
+  },
+  "properties": {
+    "apiVersion": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string"
+    },
+    "metadata": {
+      "$ref": "#/$defs/Metadata"
+    },
+    "spec": {
+      "$ref": "#/$defs/Spec"
+    }
+  },
+  "additionalProperties": false,
+  "type": "object",
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "spec"
+  ]
+}

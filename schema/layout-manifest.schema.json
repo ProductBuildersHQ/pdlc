@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://productbuildershq.org/schema/layout-manifest.schema.json",
+  "$defs": {
+    "Artifact": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "canonical": {
+          "type": "string"
+        },
+        "authority": {
+          "type": "string"
+        },
+        "profiles": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "detect": {
+          "$ref": "#/$defs/Detect"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "domain",
+        "canonical",
+        "authority",
+        "profiles"
+      ]
+    },
+    "Detect": {
+      "properties": {
+        "filenames": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "dirnames": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "content": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "under": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "notUnder": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Domain": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "qualityOnly": {
+          "type": "boolean"
+        },
+        "leafReports": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "profiles": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id"
+      ]
+    }
+  },
+  "properties": {
+    "apiVersion": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string"
+    },
+    "version": {
+      "type": "integer"
+    },
+    "immovable": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "ignore": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "domains": {
+      "items": {
+        "$ref": "#/$defs/Domain"
+      },
+      "type": "array"
+    },
+    "artifacts": {
+      "items": {
+        "$ref": "#/$defs/Artifact"
+      },
+      "type": "array"
+    }
+  },
+  "additionalProperties": false,
+  "type": "object",
+  "required": [
+    "apiVersion",
+    "kind",
+    "version",
+    "immovable",
+    "domains",
+    "artifacts"
+  ]
+}
