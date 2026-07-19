@@ -47,6 +47,9 @@ go build -o pdlc ./cmd/pdlc
 
 pdlc init --id my-product --profile standard   # scaffold pdlc.yaml
 pdlc layout show --profile full                # where every artifact belongs
+pdlc spec-profiles                             # list authoring methodologies
+pdlc plan --spec-profile big-tech-product      # which specs, where, with templates + rubrics
+pdlc template prd --spec-profile big-tech-product   # emit a template to author from
 pdlc inventory                                 # classify an existing repo
 pdlc check                                      # evaluate readiness, report gaps
 ```

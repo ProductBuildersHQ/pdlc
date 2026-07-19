@@ -29,15 +29,6 @@
       "additionalProperties": false,
       "type": "object"
     },
-    "Builder": {
-      "properties": {
-        "methodology": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
     "DesignSystemTarget": {
       "properties": {
         "spec": {
@@ -112,6 +103,12 @@
         "profile": {
           "type": "string"
         },
+        "specProfiles": {
+          "items": {
+            "$ref": "#/$defs/SpecProfile"
+          },
+          "type": "array"
+        },
         "artifacts": {
           "additionalProperties": {
             "type": "string"
@@ -123,15 +120,30 @@
         },
         "quality": {
           "$ref": "#/$defs/Quality"
-        },
-        "builder": {
-          "$ref": "#/$defs/Builder"
         }
       },
       "additionalProperties": false,
       "type": "object",
       "required": [
         "profile"
+      ]
+    },
+    "SpecProfile": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name"
       ]
     }
   },
