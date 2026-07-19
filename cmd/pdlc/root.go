@@ -18,6 +18,14 @@ func newRootCmd() *cobra.Command {
 	}
 	cmd.PersistentFlags().StringP("root", "C", ".", "project repository root")
 
-	cmd.AddCommand(newCheckCmd(), newInventoryCmd(), newInitCmd(), newLayoutCmd())
+	cmd.AddCommand(
+		newCheckCmd(),
+		newInventoryCmd(),
+		newInitCmd(),
+		newLayoutCmd(),
+		newPlanCmd(),
+		newSpecProfilesCmd(),
+		newTemplateCmd(),
+	)
 	return cmd
 }

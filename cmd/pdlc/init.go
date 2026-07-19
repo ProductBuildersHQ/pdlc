@@ -55,7 +55,7 @@ func newInitCmd() *cobra.Command {
 				proj.Spec.Locales.Targets = locales
 			}
 
-			if err := project.Save(root, proj); err != nil {
+			if err := project.Save(root, "", proj); err != nil {
 				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "created %s (profile %q)\n",
