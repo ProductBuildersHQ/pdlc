@@ -8,7 +8,7 @@ Agents do not parse prose to learn the layout. The contract exists as data:
 
 | File | Contents |
 |------|----------|
-| [`layout.yaml`](../layout.yaml) | Every artifact kind: canonical path, authority, per-profile requirement level, and detection heuristics (filenames, directory names, content signatures) |
+| [`layout.yaml`](https://github.com/ProductBuildersHQ/pdlc/blob/main/layout.yaml) | Every artifact kind: canonical path, authority, per-profile requirement level, and detection heuristics (filenames, directory names, content signatures) |
 | `pdlc.yaml` (in the project) | The project's declared profile and per-artifact overrides |
 
 `layout.yaml` also declares the **immovable list** — tool-native directories (`aidlc-docs/`, `specs/`, `.specify/`, `.visionspec/`) that must never be reorganized regardless of where detection heuristics might otherwise place their contents.
