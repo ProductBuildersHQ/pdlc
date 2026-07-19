@@ -3,6 +3,7 @@
 package project
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -14,8 +15,12 @@ import (
 	"github.com/ProductBuildersHQ/pdlc/layout"
 )
 
-// ManifestFilename is the canonical name of the project manifest.
+// ManifestFilename is the default project manifest name.
 const ManifestFilename = "pdlc.yaml"
+
+// ManifestFilenames are the manifest names Load looks for, in order. Both YAML
+// and JSON are supported; the extension selects the parser.
+var ManifestFilenames = []string{"pdlc.yaml", "pdlc.yml", "pdlc.json"}
 
 // APIVersion is the manifest contract version this package reads and writes.
 const APIVersion = "pdlc.productbuildershq.org/v1"
@@ -42,8 +47,15 @@ type Metadata struct {
 
 // Spec declares the project's scope and thresholds.
 type Spec struct {
-	// Profile selects which domains are in scope.
+	// Profile is the PDLC profile: which domains are in scope
+	// (minimal, standard, full, custom).
 	Profile layout.Profile `json:"profile" yaml:"profile" jsonschema:"required"`
+
+	// SpecProfiles are the pluggable methodologies the project uses. Each is
+	// either a VisionSpec authoring profile (big-tech-product, big-tech-feature)
+	// or a third-party builder methodology (aws-aidlc, github-speckit). A bare
+	// string is shorthand for {name, provider: visionspec, role: authoring}.
+	SpecProfiles []SpecProfile `json:"specProfiles,omitempty" yaml:"specProfiles,omitempty"`
 
 	// Artifacts overrides the profile's level for individual domains,
 	// keyed by domain ID (for example "guides" or "a11y").
@@ -54,9 +66,90 @@ type Spec struct {
 
 	// Quality holds per-tool conformance targets.
 	Quality Quality `json:"quality,omitempty" yaml:"quality,omitempty"`
+}
 
-	// Builder names the downstream engineering methodology.
-	Builder Builder `json:"builder,omitempty" yaml:"builder,omitempty"`
+// Provider identifies who resolves a spec profile.
+type Provider string
+
+const (
+	// ProviderVisionSpec resolves a spec profile to VisionSpec templates and rubrics.
+	ProviderVisionSpec Provider = "visionspec"
+
+	// ProviderAIDLC resolves to the AWS AI-DLC builder methodology.
+	ProviderAIDLC Provider = "aidlc"
+
+	// ProviderSpecKit resolves to the GitHub Spec Kit builder methodology.
+	ProviderSpecKit Provider = "speckit"
+)
+
+// Role is what a spec profile contributes to the lifecycle.
+type Role string
+
+const (
+	// RoleAuthoring produces product-definition specs (templates + rubrics).
+	RoleAuthoring Role = "authoring"
+
+	// RoleBuilder consumes the baseline and produces implementation artifacts.
+	RoleBuilder Role = "builder"
+)
+
+// SpecProfile is one pluggable methodology.
+type SpecProfile struct {
+	// Name is the methodology name, e.g. "big-tech-product" or "aws-aidlc".
+	Name string `json:"name" yaml:"name"`
+
+	// Provider resolves the methodology; defaults to visionspec.
+	Provider Provider `json:"provider,omitempty" yaml:"provider,omitempty"`
+
+	// Role is what it contributes; defaults to authoring.
+	Role Role `json:"role,omitempty" yaml:"role,omitempty"`
+}
+
+// ResolvedProvider returns the provider, defaulting to visionspec.
+func (s SpecProfile) ResolvedProvider() Provider {
+	if s.Provider == "" {
+		return ProviderVisionSpec
+	}
+	return s.Provider
+}
+
+// ResolvedRole returns the role, defaulting to authoring.
+func (s SpecProfile) ResolvedRole() Role {
+	if s.Role == "" {
+		return RoleAuthoring
+	}
+	return s.Role
+}
+
+// UnmarshalYAML accepts either a bare string (name shorthand) or a mapping.
+func (s *SpecProfile) UnmarshalYAML(value *yaml.Node) error {
+	if value.Kind == yaml.ScalarNode {
+		s.Name = value.Value
+		return nil
+	}
+	type alias SpecProfile
+	var a alias
+	if err := value.Decode(&a); err != nil {
+		return err
+	}
+	*s = SpecProfile(a)
+	return nil
+}
+
+// UnmarshalJSON accepts either a bare string (name shorthand) or an object.
+func (s *SpecProfile) UnmarshalJSON(data []byte) error {
+	var name string
+	if err := json.Unmarshal(data, &name); err == nil {
+		s.Name = name
+		return nil
+	}
+	type alias SpecProfile
+	var a alias
+	if err := json.Unmarshal(data, &a); err != nil {
+		return err
+	}
+	*s = SpecProfile(a)
+	return nil
 }
 
 // Locales declares localization scope.
@@ -99,11 +192,6 @@ type L10nTarget struct {
 	MinimumCoverage float64 `json:"minimumCoverage,omitempty" yaml:"minimumCoverage,omitempty"`
 }
 
-// Builder names the downstream engineering methodology consuming the baseline.
-type Builder struct {
-	Methodology string `json:"methodology,omitempty" yaml:"methodology,omitempty"`
-}
-
 // New returns a project manifest with the given identity and profile.
 func New(id, title string, profile layout.Profile) *Project {
 	return &Project{
@@ -114,42 +202,85 @@ func New(id, title string, profile layout.Profile) *Project {
 	}
 }
 
-// Load reads the project manifest from a repository root. It returns
-// ErrNotFound (wrapped) when the repository has no pdlc.yaml.
+// Load reads the project manifest from a repository root, accepting either YAML
+// (pdlc.yaml, pdlc.yml) or JSON (pdlc.json). It returns ErrNotFound (wrapped)
+// when no manifest is present.
 func Load(root string) (*Project, error) {
-	p := filepath.Join(root, ManifestFilename)
-	data, err := os.ReadFile(p)
+	path, err := FindManifest(root)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("%w at %s", ErrNotFound, p)
-		}
-		return nil, fmt.Errorf("read %s: %w", p, err)
+		return nil, err
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("read %s: %w", path, err)
 	}
 
 	var proj Project
-	if err := yaml.Unmarshal(data, &proj); err != nil {
-		return nil, fmt.Errorf("parse %s: %w", p, err)
+	if err := unmarshalByExt(path, data, &proj); err != nil {
+		return nil, fmt.Errorf("parse %s: %w", path, err)
 	}
 	if err := proj.Validate(); err != nil {
-		return nil, fmt.Errorf("%s: %w", p, err)
+		return nil, fmt.Errorf("%s: %w", path, err)
 	}
 	return &proj, nil
 }
 
-// Save writes the project manifest to a repository root.
-func Save(root string, proj *Project) error {
+// FindManifest returns the path of the first manifest present under root, or a
+// wrapped ErrNotFound.
+func FindManifest(root string) (string, error) {
+	for _, name := range ManifestFilenames {
+		p := filepath.Join(root, name)
+		if _, err := os.Stat(p); err == nil {
+			return p, nil
+		} else if !os.IsNotExist(err) {
+			return "", fmt.Errorf("stat %s: %w", p, err)
+		}
+	}
+	return "", fmt.Errorf("%w in %s", ErrNotFound, root)
+}
+
+// Save writes the project manifest to a repository root. The format follows the
+// filename: .json is written as JSON, everything else as YAML. When name is
+// empty the default (pdlc.yaml) is used.
+func Save(root, name string, proj *Project) error {
 	if err := proj.Validate(); err != nil {
 		return err
 	}
-	data, err := yaml.Marshal(proj)
-	if err != nil {
-		return fmt.Errorf("marshal project manifest: %w", err)
+	if name == "" {
+		name = ManifestFilename
 	}
-	p := filepath.Join(root, ManifestFilename)
-	if err := os.WriteFile(p, data, 0o644); err != nil {
-		return fmt.Errorf("write %s: %w", p, err)
+	path := filepath.Join(root, name)
+
+	data, err := marshalByExt(path, proj)
+	if err != nil {
+		return err
+	}
+	if err := os.WriteFile(path, data, 0o644); err != nil {
+		return fmt.Errorf("write %s: %w", path, err)
 	}
 	return nil
+}
+
+func unmarshalByExt(path string, data []byte, v any) error {
+	if strings.EqualFold(filepath.Ext(path), ".json") {
+		return json.Unmarshal(data, v)
+	}
+	return yaml.Unmarshal(data, v)
+}
+
+func marshalByExt(path string, v any) ([]byte, error) {
+	if strings.EqualFold(filepath.Ext(path), ".json") {
+		data, err := json.MarshalIndent(v, "", "  ")
+		if err != nil {
+			return nil, fmt.Errorf("marshal project manifest: %w", err)
+		}
+		return append(data, '\n'), nil
+	}
+	data, err := yaml.Marshal(v)
+	if err != nil {
+		return nil, fmt.Errorf("marshal project manifest: %w", err)
+	}
+	return data, nil
 }
 
 // Validate checks the manifest for internal consistency.
@@ -171,6 +302,11 @@ func (p *Project) Validate() error {
 	for domain, lvl := range p.Spec.Artifacts {
 		if !lvl.Valid() {
 			problems = append(problems, fmt.Sprintf("override %q: unknown level %q", domain, lvl))
+		}
+	}
+	for i, sp := range p.Spec.SpecProfiles {
+		if sp.Name == "" {
+			problems = append(problems, fmt.Sprintf("specProfiles[%d]: name is required", i))
 		}
 	}
 	if t := p.Spec.Quality.L10n; t != nil && (t.MinimumCoverage < 0 || t.MinimumCoverage > 1) {
