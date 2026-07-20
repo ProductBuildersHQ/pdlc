@@ -6,24 +6,35 @@ repo_name: ProductBuildersHQ/pdlc
 
 theme:
   name: material
+  custom_dir: docs/overrides
   palette:
+    # Light mode first (ProductBuildersHQ default)
     - scheme: default
-      primary: indigo
-      accent: indigo
+      primary: custom
+      accent: custom
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - scheme: slate
-      primary: indigo
-      accent: indigo
+      primary: custom
+      accent: custom
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
   features:
     - navigation.sections
+    - navigation.expand
     - navigation.top
     - search.highlight
     - content.code.copy
+
+# ProductBuildersHQ Theme Assets (served from main site)
+extra_css:
+  - https://productbuildershq.com/css/productbuildershq-mkdocs.css
+
+extra_javascript:
+  - https://productbuildershq.com/js/site-nav.min.js
+  - https://productbuildershq.com/js/pbhq-nav.js
 
 markdown_extensions:
   - admonition
@@ -47,3 +58,8 @@ nav:
       - Adoption: specification/adoption.md
   - Releases:
       - v0.1.0: releases/v0.1.0.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/ProductBuildersHQ/pdlc
