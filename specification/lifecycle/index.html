@@ -1018,28 +1018,50 @@
 <p>Each stage lists its deliverables, the tool that produces them, and its exit gate. Quality evaluation (see <a href="../quality/">quality.md</a>) and review-site assembly (see <a href="../review-site/">review-site.md</a>) run continuously across all stages, not as a final stage.</p>
 <h3 id="1-discovery">1. Discovery<a class="headerlink" href="#1-discovery" title="Permanent link">&para;</a></h3>
 <p><em>Why build this, and is it worth building?</em></p>
+<p>Discovery splits three ways by structure and sensitivity — the mirror image of how the prototype sits downstream of the specs:</p>
 <table>
 <thead>
 <tr>
 <th>Deliverable</th>
 <th>Location</th>
-<th>Produced with</th>
+<th>Authority</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Opportunity spec, market analysis</td>
+<td>Opportunity spec, vision</td>
 <td><code>docs/specs/source/</code></td>
-<td>VisionSpec (discovery profiles)</td>
+<td>normative — VisionSpec</td>
 </tr>
 <tr>
-<td>Vision</td>
-<td><code>docs/specs/source/</code></td>
-<td>VisionSpec</td>
+<td>Competitive matrix, SWOT, TAM/SAM/SOM</td>
+<td><code>docs/specs/market/</code></td>
+<td>informative — VisionSpec discovery spec types</td>
+</tr>
+<tr>
+<td>Personas</td>
+<td><code>docs/personas/</code> (+ <code>personas.json</code>)</td>
+<td>normative — synthesized customer spec</td>
+</tr>
+<tr>
+<td>Research synthesis notes</td>
+<td><code>docs/discovery/</code></td>
+<td>informative — narrative, PII-free</td>
+</tr>
+<tr>
+<td>Evidence references</td>
+<td><code>docs/discovery/sources.yaml</code></td>
+<td>evidence — points to external raw data</td>
+</tr>
+<tr>
+<td>Raw customer/market evidence (interviews, surveys, analytics)</td>
+<td><strong>outside the repo</strong> — excluded, or a separate RBAC/ABAC store</td>
+<td>evidence — never in VisionSpec, never published</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Exit gate:</strong> opportunity approved by product person.</p>
+<p>The synthesized specs are the <em>conclusions</em>; the raw evidence is the <em>source material</em> they are grounded in. VisionSpec consumes discovery evidence to ground its synthesis the same way the builder later consumes the baseline — evidence in, specs out. Raw PII evidence never enters the reviewable repository; it is referenced from <code>sources.yaml</code>, which lets requirements and personas cite their evidence without exposing it (see <a href="../project-layout/#where-spec-types-are-defined-vs-where-instances-live">project layout</a>).</p>
+<p><strong>Exit gate:</strong> opportunity approved by product person; where analytical specs are in scope, their VisionSpec rubrics pass.</p>
 <h3 id="2-definition">2. Definition<a class="headerlink" href="#2-definition" title="Permanent link">&para;</a></h3>
 <p><em>What are we building, for whom, and how do we describe it?</em></p>
 <table>
