@@ -8,7 +8,7 @@
   "releases": [
     {
       "version": "v0.1.0",
-      "date": "2026-07-19",
+      "date": "2026-07-20",
       "commit": "0abb1d3",
       "highlights": [
         { "description": "Initial release of the ProductBuildersHQ Product Development Lifecycle (PDLC): the normative specification plus a Go module that classifies a project repository against the layout contract and evaluates readiness for handoff to a builder" },
