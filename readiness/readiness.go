@@ -508,7 +508,7 @@ func Write(root string, rep *rubric.Rubric) (string, error) {
 		return "", fmt.Errorf("marshal readiness report: %w", err)
 	}
 	data = append(data, '\n')
-	if err := os.WriteFile(dest, data, 0o644); err != nil {
+	if err := os.WriteFile(dest, data, 0o600); err != nil {
 		return "", fmt.Errorf("write %s: %w", dest, err)
 	}
 	return dest, nil
