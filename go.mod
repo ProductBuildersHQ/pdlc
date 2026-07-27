@@ -5,7 +5,7 @@ go 1.26.1
 require (
 	github.com/ProductBuildersHQ/visionspec v0.14.0
 	github.com/invopop/jsonschema v0.14.0
-	github.com/plexusone/structured-evaluation v0.10.0
+	github.com/plexusone/structured-evaluation v0.11.0
 	github.com/spf13/cobra v1.10.2
 	gopkg.in/yaml.v3 v3.0.1
 )
