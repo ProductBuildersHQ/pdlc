@@ -7,6 +7,31 @@
   "maintainers": ["johncwang@gmail.com"],
   "releases": [
     {
+      "version": "v0.2.0",
+      "date": "2026-08-15",
+      "commit": "d6342a0",
+      "highlights": [
+        { "description": "The six-stage PDLC model (Product Definition, Builder Definition, Implementation, Deployment, Builder Operations, Product Operations) is now re-exported as a first-class Go API, backed by the canonical catalog entry in productbuildershq-frameworks v0.3.0", "commit": "0db9f6c" }
+      ],
+      "added": [
+        { "description": "`Stage` type (re-exporting `frameworks.PDLCPhase`) and `Stages()`/`MustStages()`/`StageByID()` functions, plus six canonical `StageXxx` ID constants (`StageProductDefinition` through `StageProductOperations`), so downstream consumers depend on `pdlc` rather than importing the catalog module directly", "commit": "0db9f6c" }
+      ],
+      "fixed": [
+        { "description": "`docs/specification/lifecycle.md`'s link to `stages.go` used a relative path outside the `docs/` tree, which failed `mkdocs build --strict`; now an absolute GitHub blob URL", "commit": "7bd7f68" }
+      ],
+      "tests": [
+        { "description": "`TestStages`, `TestMustStages`, `TestStageByID`, `TestStageIDConstantsMatchCatalog` — stage order, canonical-catalog resolution, and every exported stage-ID constant resolving via `StageByID`", "commit": "73d7e7b" }
+      ],
+      "documentation": [
+        { "description": "Rewrote `lifecycle.md` from the old two-lifecycle framing (Product Definition Lifecycle / Builder Lifecycle) to the full six-stage model; Product Definition's seven sub-stages remain normatively unchanged", "commit": "d1b3398" },
+        { "description": "Added a Go Module Usage section to README.md and docs/index.md documenting `Stages()`/`MustStages()`/`StageByID()` alongside the pre-existing `Layout()`/`MustLayout()`, and updated the productbuildershq-frameworks ecosystem-table row to reflect the new dependency/re-export relationship", "commit": "d6342a0" }
+      ],
+      "dependencies": [
+        { "description": "Bump `github.com/plexusone/structured-evaluation` from v0.10.0 to v0.13.0", "commit": "4e5fd5e" },
+        { "description": "Add `github.com/ProductBuildersHQ/productbuildershq-frameworks` v0.3.0", "commit": "0db9f6c" }
+      ]
+    },
+    {
       "version": "v0.1.0",
       "date": "2026-07-20",
       "commit": "0abb1d3",
