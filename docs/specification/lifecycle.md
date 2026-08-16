@@ -1,6 +1,6 @@
 # PDLC Lifecycle
 
-PDLC is a **six-stage** lifecycle, machine-readably cataloged in [`productbuildershq-frameworks`](https://github.com/ProductBuildersHQ/productbuildershq-frameworks/tree/main/frameworks/pdlc) and re-exported from this module via [`Stages()`](../../stages.go). Each of AWS AI-DLC's three phases (Inception, Construction, Operation) splits into two parallel lenses — **product** and **builder** — so every stage has exactly one accountable role, while the two stages within a phase proceed together rather than gating each other:
+PDLC is a **six-stage** lifecycle, machine-readably cataloged in [`productbuildershq-frameworks`](https://github.com/ProductBuildersHQ/productbuildershq-frameworks/tree/main/frameworks/pdlc) and re-exported from this module via [`Stages()`](https://github.com/ProductBuildersHQ/pdlc/blob/main/stages.go). Each of AWS AI-DLC's three phases (Inception, Construction, Operation) splits into two parallel lenses — **product** and **builder** — so every stage has exactly one accountable role, while the two stages within a phase proceed together rather than gating each other:
 
 ```text
 ┌──────────────────────┬──────────────────────┬──────────────────────────────┐
