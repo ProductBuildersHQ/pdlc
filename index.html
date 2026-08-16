@@ -842,7 +842,7 @@
 </tr>
 <tr>
 <td><a href="https://github.com/ProductBuildersHQ/productbuildershq-frameworks">productbuildershq-frameworks</a></td>
-<td>Machine-readable framework definitions (including PDLC and AWS AI-DLC) with PIDL process models</td>
+<td>Machine-readable framework catalog; owns the canonical six-stage PDLC entry (deliverables, gates, dependency graph, AI-DLC crosswalk) that this module pins as a dependency and re-exports via <code>Stages()</code></td>
 </tr>
 </tbody>
 </table>
@@ -907,6 +907,14 @@
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>pdlc<span class="w"> </span>template<span class="w"> </span>prd<span class="w"> </span>--spec-profile<span class="w"> </span>big-tech-product<span class="w">   </span><span class="c1"># emit a template to author from</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>pdlc<span class="w"> </span>inventory<span class="w">                                 </span><span class="c1"># classify an existing repo</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>pdlc<span class="w"> </span>check<span class="w">                                      </span><span class="c1"># evaluate readiness, report gaps</span>
+</code></pre></div>
+<p>The Go module also exposes the layout contract and the six PDLC stages directly:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="s">&quot;github.com/ProductBuildersHQ/pdlc&quot;</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nx">manifest</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pdlc</span><span class="p">.</span><span class="nx">MustLayout</span><span class="p">()</span><span class="w">   </span><span class="c1">// canonical project-repository layout contract</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nx">stages</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pdlc</span><span class="p">.</span><span class="nx">MustStages</span><span class="p">()</span><span class="w">     </span><span class="c1">// six stages, re-exported from productbuildershq-frameworks</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="nx">builderDef</span><span class="p">,</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pdlc</span><span class="p">.</span><span class="nx">StageByID</span><span class="p">(</span><span class="nx">pdlc</span><span class="p">.</span><span class="nx">StageBuilderDefinition</span><span class="p">)</span>
 </code></pre></div>
 <p>See the <a href="releases/v0.1.0/">latest release</a> for what's included.</p>
 
