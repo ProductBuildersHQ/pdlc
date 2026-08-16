@@ -3,6 +3,7 @@ module github.com/ProductBuildersHQ/pdlc
 go 1.26.1
 
 require (
+	github.com/ProductBuildersHQ/productbuildershq-frameworks v0.3.0
 	github.com/ProductBuildersHQ/visionspec v0.14.0
 	github.com/invopop/jsonschema v0.14.0
 	github.com/plexusone/structured-evaluation v0.13.0
