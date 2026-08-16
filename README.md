@@ -37,7 +37,7 @@ PDLC answers: *what does a complete product definition look like, where does eve
 | [pdlc-workflows](https://github.com/ProductBuildersHQ/pdlc-workflows) | Executable agent-rules reference implementation of this specification |
 | [visionspec](https://github.com/ProductBuildersHQ/visionspec) | Specification-artifact engine: spec types, templates, rubrics, LLM evaluation, reconciliation, export targets |
 | [visionstudio](https://github.com/ProductBuildersHQ/visionstudio) | Desktop IDE for authoring, reviewing, and observing PDLC projects |
-| [productbuildershq-frameworks](https://github.com/ProductBuildersHQ/productbuildershq-frameworks) | Machine-readable framework definitions (including PDLC and AWS AI-DLC) with PIDL process models |
+| [productbuildershq-frameworks](https://github.com/ProductBuildersHQ/productbuildershq-frameworks) | Machine-readable framework catalog; owns the canonical six-stage PDLC entry (deliverables, gates, dependency graph, AI-DLC crosswalk) that this module pins as a dependency and re-exports via `Stages()` |
 
 PDLC is the *specification*; `pdlc-workflows` is the *reference implementation* — the same relationship AWS uses between the AI-DLC methodology and [awslabs/aidlc-workflows](https://github.com/awslabs/aidlc-workflows).
 
@@ -54,6 +54,32 @@ PDLC is the *specification*; `pdlc-workflows` is the *reference implementation* 
 | [Adoption](docs/specification/adoption.md) | Agent-driven brownfield migration to the canonical layout + readiness evaluation |
 | [`layout.yaml`](layout.yaml) | The layout contract in machine-readable form: canonical paths, detection heuristics, per-profile requirements |
 | [`model/`](model/) | The lifecycle as a formal [PIDL](https://github.com/grokify/pidl) process model — typed steps, data flows over canonical paths, and gates |
+
+## Go Module Usage
+
+```bash
+go get github.com/ProductBuildersHQ/pdlc
+```
+
+```go
+import "github.com/ProductBuildersHQ/pdlc"
+
+// The canonical project-repository layout contract.
+manifest := pdlc.MustLayout()
+
+// The six PDLC stages (Product Definition, Builder Definition,
+// Implementation, Deployment, Builder Operations, Product Operations),
+// re-exported from productbuildershq-frameworks so callers depend on
+// pdlc rather than the catalog module directly.
+stages := pdlc.MustStages()
+for _, s := range stages {
+    fmt.Printf("%s (%s)\n", s.Name, s.Role)
+}
+
+builderDef, _ := pdlc.StageByID(pdlc.StageBuilderDefinition)
+```
+
+Stage IDs are stable string constants (`pdlc.StageProductDefinition` through `pdlc.StageProductOperations`) — downstream consumers such as `specification-workflow-spec` and Threat Model Spec import these rather than re-declaring them. See [Lifecycle](docs/specification/lifecycle.md) for the full stage-by-stage narrative.
 
 ## Core principles
 

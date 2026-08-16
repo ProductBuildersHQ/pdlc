@@ -12,7 +12,7 @@ PDLC answers: *what does a complete product definition look like, where does eve
 | [pdlc-workflows](https://github.com/ProductBuildersHQ/pdlc-workflows) | Executable agent-rules reference implementation of this specification |
 | [visionspec](https://github.com/ProductBuildersHQ/visionspec) | Specification-artifact engine: spec types, templates, rubrics, LLM evaluation, reconciliation, export targets |
 | [visionstudio](https://github.com/ProductBuildersHQ/visionstudio) | Desktop IDE for authoring, reviewing, and observing PDLC projects |
-| [productbuildershq-frameworks](https://github.com/ProductBuildersHQ/productbuildershq-frameworks) | Machine-readable framework definitions (including PDLC and AWS AI-DLC) with PIDL process models |
+| [productbuildershq-frameworks](https://github.com/ProductBuildersHQ/productbuildershq-frameworks) | Machine-readable framework catalog; owns the canonical six-stage PDLC entry (deliverables, gates, dependency graph, AI-DLC crosswalk) that this module pins as a dependency and re-exports via `Stages()` |
 
 PDLC is the *specification*; `pdlc-workflows` is the *reference implementation* — the same relationship AWS uses between the AI-DLC methodology and [awslabs/aidlc-workflows](https://github.com/awslabs/aidlc-workflows).
 
@@ -52,6 +52,17 @@ pdlc plan --spec-profile big-tech-product      # which specs, where, with templa
 pdlc template prd --spec-profile big-tech-product   # emit a template to author from
 pdlc inventory                                 # classify an existing repo
 pdlc check                                      # evaluate readiness, report gaps
+```
+
+The Go module also exposes the layout contract and the six PDLC stages directly:
+
+```go
+import "github.com/ProductBuildersHQ/pdlc"
+
+manifest := pdlc.MustLayout()   // canonical project-repository layout contract
+stages := pdlc.MustStages()     // six stages, re-exported from productbuildershq-frameworks
+
+builderDef, _ := pdlc.StageByID(pdlc.StageBuilderDefinition)
 ```
 
 See the [latest release](releases/v0.1.0.md) for what's included.
