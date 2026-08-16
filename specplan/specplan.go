@@ -11,11 +11,12 @@ package specplan
 import (
 	"fmt"
 	"path"
+	"slices"
 
-	vsprofiles "github.com/ProductBuildersHQ/visionspec/pkg/profiles"
 	vsrubrics "github.com/ProductBuildersHQ/visionspec/pkg/rubrics"
 	vstemplates "github.com/ProductBuildersHQ/visionspec/pkg/templates"
 	vstypes "github.com/ProductBuildersHQ/visionspec/pkg/types"
+	vsworkflows "github.com/ProductBuildersHQ/visionspec/pkg/workflows"
 )
 
 // DefaultSpecsRoot is where PDLC places VisionSpec output under a project.
@@ -50,7 +51,9 @@ type Plan struct {
 
 // ListProfiles returns the available VisionSpec authoring profile names.
 func ListProfiles() []string {
-	return vsprofiles.DefaultProfileNames
+	names := vsworkflows.DefaultLoader().Available()
+	slices.Sort(names)
+	return names
 }
 
 // Resolve builds the authoring plan for a VisionSpec profile. specsRoot may be
@@ -60,18 +63,18 @@ func Resolve(profileName, specsRoot string) (*Plan, error) {
 		specsRoot = DefaultSpecsRoot
 	}
 
-	profile, err := vsprofiles.DefaultLoader().Load(profileName)
+	profile, err := vsworkflows.DefaultLoader().Load(profileName)
 	if err != nil {
 		return nil, fmt.Errorf("load spec profile %q: %w", profileName, err)
 	}
 
 	// Chain the profile's own loaders over the embedded defaults, so a spec the
 	// profile does not carry directly still resolves from the default set.
-	templateLoader := vstemplates.NewChainLoader(profile.GetTemplateLoader(), vstemplates.DefaultLoader())
-	rubricLoader := vsrubrics.NewChainLoader(profile.GetRubricLoader(), vsrubrics.DefaultLoader())
+	templateLoader := vstemplates.NewChainLoader(vstemplates.LoaderForWorkflow(profile), vstemplates.DefaultLoader())
+	rubricLoader := vsrubrics.NewChainLoader(vsrubrics.LoaderForWorkflow(profile), vsrubrics.DefaultLoader())
 
 	plan := &Plan{SpecProfile: profileName, SpecsRoot: specsRoot}
-	for _, name := range profile.RequiredSpecs() {
+	for _, name := range vstypes.SpecConfigFromWorkflow(profile.Workflow).RequiredSpecs() {
 		specType := vstypes.SpecType(name)
 
 		art := Artifact{
@@ -92,11 +95,11 @@ func Resolve(profileName, specsRoot string) (*Plan, error) {
 // Template returns the template content for a spec type under a profile, chaining
 // the profile's templates over the embedded defaults.
 func Template(profileName, specType string) (string, error) {
-	profile, err := vsprofiles.DefaultLoader().Load(profileName)
+	profile, err := vsworkflows.DefaultLoader().Load(profileName)
 	if err != nil {
 		return "", fmt.Errorf("load spec profile %q: %w", profileName, err)
 	}
-	loader := vstemplates.NewChainLoader(profile.GetTemplateLoader(), vstemplates.DefaultLoader())
+	loader := vstemplates.NewChainLoader(vstemplates.LoaderForWorkflow(profile), vstemplates.DefaultLoader())
 	tmpl, err := loader.Load(vstypes.SpecType(specType))
 	if err != nil {
 		return "", fmt.Errorf("load template %q for profile %q: %w", specType, profileName, err)
