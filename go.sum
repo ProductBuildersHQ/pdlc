@@ -1,7 +1,7 @@
 github.com/ProductBuildersHQ/productbuildershq-frameworks v0.3.0 h1:ugvcrsZJGuCOC+VQdMzY6HNLkW8L/0g8Ywmt+MaYJTU=
 github.com/ProductBuildersHQ/productbuildershq-frameworks v0.3.0/go.mod h1:5XFIy8+0ATiCuOa0LrXASnlF+qtGPTTmAIkQqlUsMN8=
-github.com/ProductBuildersHQ/visionspec v0.16.0 h1:rSE/aZyeqwbKcZNlKyCvxyLDEWNO430IYVllQyhMPkM=
-github.com/ProductBuildersHQ/visionspec v0.16.0/go.mod h1:fa9ualzdiAfarZXn76vdXb82Q0X+P0JkhmMTWPA3ohU=
+github.com/ProductBuildersHQ/visionspec v0.17.0 h1:3Ek9OAKo7FPrnwqV1cxW2JOmkG6HBRFOg2RrnGMfFJs=
+github.com/ProductBuildersHQ/visionspec v0.17.0/go.mod h1:EteGmKM+X1EZCpO+6lzLV9oyqTfSKeXXWGWghtM/HYs=
 github.com/bahlo/generic-list-go v0.2.0 h1:5sz/EEAK+ls5wF+NeqDpk5+iNdMDXrh3z3nPnH1Wvgk=
 github.com/bahlo/generic-list-go v0.2.0/go.mod h1:2KvAjgMlE5NNynlg/5iLrrCCZ2+5xWbdbCW3pNTGyYg=
 github.com/buger/jsonparser v1.6.1 h1:I0phFv0PlbLHnM7TZAVjZ2MJ2/eWRTDyuO7GLR98IEs=
@@ -11,8 +11,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/grokify/oscompat v0.5.0 h1:qGUym1Jt+yecBmBM7FnimvuUWLs8VVRCxotpHTzaWH0=
 github.com/grokify/oscompat v0.5.0/go.mod h1:Ekex/WzHaA39LNt5xbeQRASo74NEXAIqBlqdvNF2oUM=
-github.com/grokify/prism-roadmap v0.17.0 h1:xsM+LDffaocNQQ4cdYlchJ7565fj+0PGIBte1me4dgU=
-github.com/grokify/prism-roadmap v0.17.0/go.mod h1:B3XMoton1box8nhTk/i9TcG+tPouz2tbbUUi3I7mvzo=
+github.com/grokify/prism-roadmap v0.18.0 h1:cAtiS26U8d6Xgs0OPmP8tkqzqstDALvjWefD2cFqgJ4=
+github.com/grokify/prism-roadmap v0.18.0/go.mod h1:B3XMoton1box8nhTk/i9TcG+tPouz2tbbUUi3I7mvzo=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
 github.com/invopop/jsonschema v0.14.0 h1:MHQqLhvpNUZfw+hM3AZDYK7jxO8FZoQeQM77g8iyZjg=
